@@ -1,1 +1,15 @@
-# Wolf_score
+## Shell Commands to activate the code:
+
+```
+git clone https://github.com/abcdefg133hi/Wolf_score.git
+cd wolf_score
+python3 ./wolf.py -h
+```
+
+## The commands
+```
+python3 ./wolf.py -c  [YourFile.csv:Num of People]   #For creating the recording file.
+python3 ./wolf.py -p1 [YourFile.csv]                 #For playing 預女獵白.
+python3 ./wolf.py -p2 [YourFile.csv]                 #For playing 狼王守衛.
+```
+
