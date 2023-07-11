@@ -13,3 +13,9 @@ python3 ./wolf.py -p1 [YourFile.csv]                 #For playing 預女獵白.
 python3 ./wolf.py -p2 [YourFile.csv]                 #For playing 狼王守衛.
 ```
 
+## Quick Start
+```
+python3 ./wolf.py -c record.csv:12
+python3 ./wolf.py -p1 record.csv
+```
+
