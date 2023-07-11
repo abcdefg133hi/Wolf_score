@@ -6,6 +6,7 @@ import os
 import argparse
 from pprint import pprint, pformat
 from collections import OrderedDict
+from wolfcommon import *
 
 import numpy as np
 import pandas as pd
@@ -19,11 +20,6 @@ import pandas as pd
 #狼王: -wk, king of wolves
 #守衛: -g, guard
 
-def order_initialize(array):
-    n = len(array)
-    for i in range(n):
-        array[i] = i+1
-    return array
 
 
 def file_extension_error():
@@ -45,7 +41,8 @@ def PWHI():#預女獵白
     voting_status = np.array([-1,-1,-1,-1,-1,-1, -1])     #0 for 該輪平票PK, 1 for 有進行到該輪 [警長, 第一輪, ......]
     data_play = []
     wolf_camp = []
-    good_camp = []
+    villager_camp = []
+    god_camp = []
     witch = 0
     prophet = 0
     hunter = 0
@@ -53,6 +50,9 @@ def PWHI():#預女獵白
     sergeant = 0  #警長
     tickets = np.zeros(12)
     player_survive = order_initialize(np.zeros(12))
+    game_status = True
+    game_day = 0
+    winner = -1   #wolf:1, good:0
     print("版子為：預女獵白")
     print("配置為：")
     print("$好人：預言家、女巫、獵人、白痴神")
@@ -69,63 +69,64 @@ def PWHI():#預女獵白
             wolf_camp.append(i+1)
         elif temp_id == 2:
             temp_identification = "預言家"
-            good_camp.append(i+1)
+            god_camp.append(i+1)
             prophet = i+1
         elif temp_id == 3:
             temp_identification = "女巫"
-            good_camp.append(i+1)
+            god_camp.append(i+1)
             witch = i+1
         elif temp_id == 4:
             temp_identification = "獵人"
-            good_camp.append(i+1)
+            god_camp.append(i+1)
             hunter = i+1
         elif temp_id == 5:
             temp_identification = "白痴神"
-            good_camp.append(i+1)
+            god_camp.append(i+1)
             witch = i+1
         elif temp_id == 6:
             temp_identification = "平民"
-            good_camp.append(i+1)
+            villager_camp.append(i+1)
         else:
             print("Unknown Commands!")
             sys.exit()
         data_play.append({'Seat':i+1, 'No':temp_no, 'Identification': temp_identification, 'Identifiaction(id in number)': temp_id,
                           "警長投票 (0 for 棄票, -1 for 無法投票)": -1,
-                          "First Round Vote (0 for 棄票, -1 for 無法投票)": -1,
-                          "Second Round Vote (0 for 棄票, -1 for 無法投票)": -1,
-                          "Third Round Vote (0 for 棄票, -1 for 無法投票)": -1,
-                          "Fourth Round Vote (0 for 棄票, -1 for 無法投票)": -1,
-                          "Fixth Round Vote (0 for 棄票, -1 for 無法投票)": -1,
-                          "Sixth Round Vote (0 for 棄票, -1 for 無法投票)": -1,
+                          "第1輪投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第2輪投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第3輪投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第4輪投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第5輪投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第6輪投票 (0 for 棄票, -1 for 無法投票)": -1,
                           "警長PK投票 (0 for 棄票, -1 for 無法投票)": -1,
-                          "第一輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
-                          "第二輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
-                          "第三輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
-                          "第四輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
-                          "第五輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
-                          "第六輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第1輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第2輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第3輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第4輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第5輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
+                          "第6輪PK投票 (0 for 棄票, -1 for 無法投票)": -1,
                           "特殊功能加分": 0})
     df_play = pd.DataFrame(data_play, columns=['Seat', 'No', 'Identification', 'Identifiaction(id in number)',
                                                '警長投票 (0 for 棄票, -1 for 無法投票)',
-                                               'First Round Vote (0 for 棄票, -1 for 無法投票)',
-                                               'Second Round Vote (0 for 棄票, -1 for 無法投票)',
-                                               'Third Round Vote (0 for 棄票, -1 for 無法投票)',
-                                               'Fourth Round Vote (0 for 棄票, -1 for 無法投票)',
-                                               'Fixth Round Vote (0 for 棄票, -1 for 無法投票)',
-                                               "Sixth Round Vote (0 for 棄票, -1 for 無法投票)",
+                                               '第1輪投票 (0 for 棄票, -1 for 無法投票)',
+                                               '第2輪投票 (0 for 棄票, -1 for 無法投票)',
+                                               '第3輪投票 (0 for 棄票, -1 for 無法投票)',
+                                               '第4輪投票 (0 for 棄票, -1 for 無法投票)',
+                                               '第5輪投票 (0 for 棄票, -1 for 無法投票)',
+                                               "第6輪投票 (0 for 棄票, -1 for 無法投票)",
                                                "警長PK投票 (0 for 棄票, -1 for 無法投票)",
-                                               "第一輪PK投票 (0 for 棄票, -1 for 無法投票)",
-                                               "第二輪PK投票 (0 for 棄票, -1 for 無法投票)",
-                                               "第三輪PK投票 (0 for 棄票, -1 for 無法投票)",
-                                               "第四輪PK投票 (0 for 棄票, -1 for 無法投票)",
-                                               "第五輪PK投票 (0 for 棄票, -1 for 無法投票)",
-                                               "第六輪PK投票 (0 for 棄票, -1 for 無法投票)",
+                                               "第1輪PK投票 (0 for 棄票, -1 for 無法投票)",
+                                               "第2輪PK投票 (0 for 棄票, -1 for 無法投票)",
+                                               "第3輪PK投票 (0 for 棄票, -1 for 無法投票)",
+                                               "第4輪PK投票 (0 for 棄票, -1 for 無法投票)",
+                                               "第5輪PK投票 (0 for 棄票, -1 for 無法投票)",
+                                               "第6輪PK投票 (0 for 棄票, -1 for 無法投票)",
                                                "特殊功能加分"])
     print("這場身份如下：")
     print(df_play[['Seat', 'No', 'Identification']])
 
     print("狼人陣營:",wolf_camp)
-    print("好人陣營:",good_camp)
+    print("神職陣營:",god_camp)
+    print("平民陣營:",villager_camp)
 
     already_death = []
     wolf_action = -1  #Kill whom  Not killing: 0
@@ -256,73 +257,26 @@ def PWHI():#預女獵白
         death = np.append(death, int(wolf_temp))
         death = np.append(death, witch_temp)
 
-
     player_survive = np.setdiff1d(player_survive, death)
-    death = np.array([])
-    tickets = np.zeros(12)      #Initialize
 
-    print("發言完畢時請按Enter以繼續")
-    input()
-    temp = input("發言完畢警長歸票:(若多名成員PK請用空格分開, 若不歸請輸入0)")
-    temp = [int(player) for player in temp.split()]
-    if len(temp) > 1:
-        print("警長票降為1票!")
-        temp = 1
-    else:
-        print("警歸%s!"%str(temp[0]))
-        temp = 1.5
+    #daily(player_survive)  return tuple(player_survive, vote_array)  vote_array = (-1,-1)
+    while(True):
+        game_day += 1
+        print("------第%s天------"%str(game_day))
+        player_survive, vote_array, hunter_status, sergeant = daily(player_survive, wolf_camp, hunter, sergeant)
+        label = "第"+str(game_day)+"輪投票 (0 for 棄票, -1 for 無法投票)"
+        label_pk = "第"+str(game_day)+"輪PK投票 (0 for 棄票, -1 for 無法投票)"
+        for i in range(12):
+            df_play[label][i] = vote_array[0,i]
+            df_play[label_pk][i] = vote_array[1,i]
+        game_status, winner = if_end(player_survive, wolf_camp, god_camp, villager_camp, sergeant)
+        if(not game_status):
+            break
+        #player_survive, vote_array, hunter_status, sergenat = night(player_survive, wolf_camp, hunter, sergeant)
 
 
-    voter = np.copy(player_survive)
-    for player in voter:
-        vote = input("%s號玩家投的是:（棄票請打0）"%str(int(player)))
-        vote = int(vote)
-        if vote not in player_survive:
-            vote = 0       #亂投票=棄票
-        df_play['First Round Vote (0 for 棄票, -1 for 無法投票)'][player-1] = vote
-        if vote == 0:
-            continue
-        if player == sergeant:
-            tickets[vote-1] += temp
-        else:
-            tickets[vote-1]+=1
-    print("投票結果如下：")
-    print(df_play[['Seat', 'No', 'First Round Vote (0 for 棄票, -1 for 無法投票)']])
-    max_tickets = np.max(tickets)
-    max_candidate = np.where(tickets == max_tickets)[0]+1
-    if len(max_candidate) > 1:
-        tickets = np.zeros(12)      #Initialize
-        all_players = np.copy(player_survive)
-        voter = np.setdiff1d(all_players,max_candidate)
-        print("因為超過一人得最高票，進行PK的為:", max_candidate)
-        print("發言完畢時請按Enter以繼續")
-        input()
-        for player in voter:
-            vote = input("%s號玩家投的是:（棄票請打0）"%str(int(player)))
-            vote = int(vote)
-            if vote not in max_candidate:
-                vote = 0       #亂投票=棄票
-            df_play['第一輪PK投票 (0 for 棄票, -1 for 無法投票)'][player-1] = vote
-            if vote == 0:
-                continue
-            tickets[vote-1] += 1
-        max_tickets = np.max(tickets)
-        max_candidate = tickets[tickets==max_tickets]
-        print("投票結果如下：")
-        print(df_play[['Seat', 'No', '第一輪PK投票 (0 for 棄票, -1 for 無法投票)']])
-        if len(max_candidate) > 1:
-            print("平票，平安日!")
 
-    death = np.append(death, tickets.argmax()+1)
-    print("%s玩家出局，請留遺言!"%str(tickets.argmax()+1))
-    if(tickets.argmax()+1==hunter):
-        hunt = input("公投出局的玩家是否要開槍:(0 for 不開槍)")
-        death = np.append(death, hunt)
-        print("%s玩家出局，請留遺言!"%hunt)
 
-    player_survive = np.setdiff1d(player_survive, death)
-    death = np.array([])
-    tickets = np.zeros(12)
 
 
 
