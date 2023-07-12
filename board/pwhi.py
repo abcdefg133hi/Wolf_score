@@ -7,6 +7,96 @@ def order_initialize(array):
         array[i] = i+1
     return array
 
+def night(player_survive, wolf_camp, witch_action, witch, prophet, hunter, sergeant):
+    wolf_temp = input("請輸入狼人擊殺對象 (0:空刀):")
+    witch_temp = input("請輸入女巫是否發動技能（-1:空, 0:救人, 座位號碼:毒人):")
+    prophet_temp = input("請輸入預言家查驗對象:")
+    prophet_action = -1  #-1:好人, 0:狼人
+    death = np.array([])
+    witch_status = 0
+    hunter_status = 0
+    if prophet not in player_survive:
+        pass
+    else:
+        for wolf in wolf_camp:
+            if wolf == int(prophet_temp):
+                prophet_action = 0
+                print("預言家查驗的玩家%s為狼人"%prophet_temp)
+                break
+        if prophet_action == -1:
+            prophet_action = "好人"
+            print("預言家查驗的玩家%s為好人"%prophet_temp)
+
+    #Witch
+    if witch not in player_survive:
+        #witch_action = -5
+        witch_temp = -1
+        pass
+    elif (int(witch_temp)==0 and (witch_action==-1 or witch_action==-3)):
+        if witch_action==-1:
+            witch_action = -2
+        else:
+            witch_action = -5
+    elif (int(witch_temp)>0 and (witch_action==-1 or witch_action==-2)):
+        if witch_action==-1:
+            witch_action = -3
+        else:
+            witch_action = -5
+    else:
+        witch_temp = -1
+    witch_temp = int(witch_temp)
+
+
+    #女巫毒狼有加分
+    if int(witch_temp) > 0:
+        a = 0
+        for wolf in wolf_camp:
+            if wolf == int(witch_temp):
+                witch_status += 0.5
+                a = 1
+                break
+        if a==0:
+            witch_status -= 0.5
+
+
+    if witch_temp == 0:
+        print("昨晚為平安夜!")
+    elif int(wolf_temp)==0 and witch_temp==-1:
+        print("昨晚為平安夜!")
+    elif int(wolf_temp)==0 and witch_temp>0:
+        print("昨晚%s倒牌"%str(witch_temp))
+        death = np.append(death, witch_temp)
+    elif witch_temp==-1:
+        print("昨晚%s倒牌"%str(wolf_temp))
+        death = np.append(death, int(wolf_temp))
+        if int(wolf_temp)==hunter:
+            hunt = input("公投出局的玩家是否要開槍:(0 for 不開槍)")
+            if hunt!=0:
+                death = np.append(death, hunt)
+                if hunt in wolf_camp:
+                    hunter_status = 0.5
+                else:
+                    hunter_status = -0.5
+                print("%s玩家出局，請留遺言!"%hunt)
+    elif witch_temp==int(wolf_temp):
+        print("昨晚%s倒牌"%str(wolf_temp))
+        death = np.append(death, int(wolf_temp))
+    else:
+        print("昨晚倒牌的玩家有兩名", wolf_temp, str(witch_temp))
+        death = np.append(death, int(wolf_temp))
+        death = np.append(death, witch_temp)
+        if int(wolf_temp)==hunter:
+            hunt = input("公投出局的玩家是否要開槍:(0 for 不開槍)")
+            if hunt!=0:
+                death = np.append(death, hunt)
+                if hunt in wolf_camp:
+                    hunter_status = 0.5
+                else:
+                    hunter_status = -0.5
+                print("%s玩家出局，請留遺言!"%hunt)
+
+    player_survive = np.setdiff1d(player_survive, death)
+    return player_survive, witch_action, witch_status, hunter_status, sergeant
 
 def daily(player_survive, wolf_camp, hunter, sergeant):
     death = np.array([])
@@ -76,9 +166,9 @@ def daily(player_survive, wolf_camp, hunter, sergeant):
             if hunt!=0:
                 death = np.append(death, hunt)
                 if hunt in wolf_camp:
-                    hunter_status = 1
+                    hunter_status = 0.5
                 else:
-                    hunter_status = -1
+                    hunter_status = -0.5
                 print("%s玩家出局，請留遺言!"%hunt)
 
         death = death.astype('float')

@@ -6,11 +6,11 @@ import os
 import argparse
 from pprint import pprint, pformat
 from collections import OrderedDict
-from wolfcommon import *
 
 import numpy as np
 import pandas as pd
 
+from board import pwhi
 #Possible bugs: no such file is a relative file
 
 #預言家: -p, prophet
@@ -38,6 +38,7 @@ def name_revision(df,i):
     return df
 
 def PWHI():#預女獵白
+    pd.set_option('mode.chained_assignment', None)
     voting_status = np.array([-1,-1,-1,-1,-1,-1, -1])     #0 for 該輪平票PK, 1 for 有進行到該輪 [警長, 第一輪, ......]
     data_play = []
     wolf_camp = []
@@ -49,7 +50,7 @@ def PWHI():#預女獵白
     idiot = 0
     sergeant = 0  #警長
     tickets = np.zeros(12)
-    player_survive = order_initialize(np.zeros(12))
+    player_survive = pwhi.order_initialize(np.zeros(12))
     game_status = True
     game_day = 0
     winner = -1   #wolf:1, good:0
@@ -249,6 +250,15 @@ def PWHI():#預女獵白
     elif witch_temp==-1:
         print("昨晚%s倒牌"%str(wolf_temp))
         death = np.append(death, int(wolf_temp))
+        if int(wolf_temp)==hunter:
+            hunt = input("公投出局的玩家是否要開槍:(0 for 不開槍)")
+            if hunt!=0:
+                death = np.append(death, hunt)
+                if hunt in wolf_camp:
+                    df_play['特殊功能加分'] += 0.5
+                else:
+                    df_play['特殊功能加分'] += -0.5
+                print("%s玩家出局，請留遺言!"%hunt)
     elif witch_temp==int(wolf_temp):
         print("昨晚%s倒牌"%str(wolf_temp))
         death = np.append(death, int(wolf_temp))
@@ -256,30 +266,44 @@ def PWHI():#預女獵白
         print("昨晚倒牌的玩家有兩名", wolf_temp, str(witch_temp))
         death = np.append(death, int(wolf_temp))
         death = np.append(death, witch_temp)
+        if int(wolf_temp)==hunter:
+            hunt = input("公投出局的玩家是否要開槍:(0 for 不開槍)")
+            if hunt!=0:
+                death = np.append(death, hunt)
+                if hunt in wolf_camp:
+                    df_play['特殊功能加分'] += 0.5
+                else:
+                    df_play['特殊功能加分'] += -0.5
+                print("%s玩家出局，請留遺言!"%hunt)
 
+    if sergeant in death:
+        temp = input("%s移交警徽給(撕掉請輸入0):"%str(sergeant))
+        sergeant = int(temp)
     player_survive = np.setdiff1d(player_survive, death)
 
-    #daily(player_survive)  return tuple(player_survive, vote_array)  vote_array = (-1,-1)
     while(True):
         game_day += 1
-        print("------第%s天------"%str(game_day))
-        player_survive, vote_array, hunter_status, sergeant = daily(player_survive, wolf_camp, hunter, sergeant)
+        print("------第%s天白天------"%str(game_day))
+        print("剩餘存活玩家為", player_survive)
+        player_survive, vote_array, hunter_status, sergeant = pwhi.daily(player_survive, wolf_camp, hunter, sergeant)
+
         label = "第"+str(game_day)+"輪投票 (0 for 棄票, -1 for 無法投票)"
         label_pk = "第"+str(game_day)+"輪PK投票 (0 for 棄票, -1 for 無法投票)"
         for i in range(12):
             df_play[label][i] = vote_array[0,i]
             df_play[label_pk][i] = vote_array[1,i]
-        game_status, winner = if_end(player_survive, wolf_camp, god_camp, villager_camp, sergeant)
+        df_play['特殊功能加分'][hunter] += hunter_status
+        game_status, winner = pwhi.if_end(player_survive, wolf_camp, god_camp, villager_camp, sergeant)
         if(not game_status):
             break
-        #player_survive, vote_array, hunter_status, sergenat = night(player_survive, wolf_camp, hunter, sergeant)
-
-
-
-
-
-
-
+        print("剩餘存活玩家為", player_survive)
+        print("------第%s天晚上------"%str(game_day+1))
+        player_survive, witch_action, witch_status, hunter_status, sergeant = pwhi.night(player_survive, wolf_camp, witch_action,witch, prophet, hunter, sergeant)
+        df_play['特殊功能加分'][hunter] += hunter_status
+        df_play['特殊功能加分'][witch] += witch_status
+        game_status, winner = pwhi.if_end(player_survive, wolf_camp, god_camp, villager_camp, sergeant)
+        if(not game_status):
+            break
 
 def main():
     """
