@@ -31,7 +31,7 @@ cd wolf_score
 python3 ./wolf.py -c record.csv:12
 python3 ./wolf.py -p2 record.csv
 ```
-Notice: Make sure that your computer contains "numpy" and "pandas" or you should first package them by
+Notice: Make sure that your computer contains "numpy" and "pandas" or you should first install them by
 ```
 pip install numpy
 pip install pandas
@@ -66,7 +66,7 @@ conda install pandas
 - 女巫毒好人: -0.5 分
 - 女巫毒好人: -0.5 分
 - 放逐公投時,好人投票投狼: +0.5 分
-- 放逐公投時,好人投票投好人: -0.5 分
+- 放逐公投時,好人投票投好人: -0.5 分<br/>
 More rules are still under developed and will be announced soon
 
 
