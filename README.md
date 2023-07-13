@@ -2,7 +2,7 @@
 
 ```
 git clone https://github.com/abcdefg133hi/Wolf_score.git
-cd wolf_score
+cd Wolf_score
 python3 ./wolf.py -h
 ```
 
@@ -19,7 +19,7 @@ python3 ./wolf.py -p4 [YourFile.csv]                 #For playing 血月獵魔.
 ### 預女獵白
 ```
 git clone https://github.com/abcdefg133hi/Wolf_score.git
-cd wolf_score
+cd Wolf_score
 python3 ./wolf.py -c record.csv:12
 python3 ./wolf.py -p1 record.csv
 open record.csv
@@ -27,7 +27,7 @@ open record.csv
 ### 狼王守衛
 ```
 git clone https://github.com/abcdefg133hi/Wolf_score.git
-cd wolf_score
+cd Wolf_score
 python3 ./wolf.py -c record.csv:12
 python3 ./wolf.py -p2 record.csv
 ```
