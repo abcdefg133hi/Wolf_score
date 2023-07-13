@@ -95,6 +95,8 @@ def night(player_survive, wolf_camp, witch_action, witch, prophet, hunter, serge
                     hunter_status = -0.5
                 print("%s玩家出局，請留遺言!"%hunt)
 
+    death = death.astype('float')
+    death = death.astype('int')
     player_survive = np.setdiff1d(player_survive, death)
     return player_survive, witch_action, witch_status, hunter_status, sergeant
 
@@ -208,7 +210,7 @@ def if_end(player_survive, wolf_camp, god_camp, villager_camp,sergeant):
         winner = 0
         return False, winner
 
-    print("遊戲繼續,天黑請閉眼!")
+    print("遊戲繼續!")
     return True, winner
 
 

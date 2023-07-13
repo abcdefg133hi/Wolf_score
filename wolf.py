@@ -299,11 +299,56 @@ def PWHI():#預女獵白
         print("剩餘存活玩家為", player_survive)
         print("------第%s天晚上------"%str(game_day+1))
         player_survive, witch_action, witch_status, hunter_status, sergeant = pwhi.night(player_survive, wolf_camp, witch_action,witch, prophet, hunter, sergeant)
-        df_play['特殊功能加分'][hunter] += hunter_status
-        df_play['特殊功能加分'][witch] += witch_status
+        df_play['特殊功能加分'][hunter-1] += hunter_status
+        df_play['特殊功能加分'][witch-1] += witch_status
         game_status, winner = pwhi.if_end(player_survive, wolf_camp, god_camp, villager_camp, sergeant)
         if(not game_status):
             break
+
+    scores = np.zeros((12,4))
+    if winner==0:   #好人獲勝
+        for player in range(1,13):
+            if player in wolf_camp:
+                scores[player-1,0] = df_play['No'][player-1]
+                scores[player-1,1] = -3
+                scores[player-1,2] = 0
+                scores[player-1,3] = 1
+
+            else:
+                scores[player-1,0] = df_play['No'][player-1]
+                scores[player-1,1] = 3
+                scores[player-1,2] = 1
+                scores[player-1,3] = 0
+    else:
+        for player in range(1,13):
+            if player in wolf_camp:
+                scores[player-1,0] = df_play['No'][player-1]
+                scores[player-1,1] = 3
+                scores[player-1,2] = 1
+                scores[player-1,3] = 0
+
+            else:
+                scores[player-1,0] = df_play['No'][player-1]
+                scores[player-1,1] = -3
+                scores[player-1,2] = 0
+                scores[player-1,3] = 1
+
+    for player in range(1,13):
+        for game_day in range(1,7):
+            label = "第"+str(game_day)+"輪投票 (0 for 棄票, -1 for 無法投票)"
+            label_pk = "第"+str(game_day)+"輪PK投票 (0 for 棄票, -1 for 無法投票)"
+            if df_play[label][player-1] in wolf_camp and player not in wolf_camp:
+                scores[player-1,1] += 0.5
+            elif df_play[label_pk][player-1] not in wolf_camp and player not in wolf_camp:
+                if df_play[label_pk][player-1] == -1:
+                    pass
+                else:
+                    scores[player-1,1] -= 0.5
+        scores[player-1,1] += df_play['特殊功能加分'][player-1]
+
+    return scores
+
+
 
 def main():
     """
@@ -331,8 +376,15 @@ def main():
             return
         print("進行的版子為:預女獵白")
         print("使用:%s作為記錄的檔案。"%file_base)
-        PWHI()
+        scores = PWHI()
         data = pd.read_csv(file_base)
+        for i in range(12):
+            data['Score'][scores[i,0]-1] += scores[i,1]
+            data['Win'][scores[i,0]-1] += scores[i,2]
+            data['Lose'][scores[i,0]-1] += scores[i,3]
+
+        data.to_csv(file_base, index=False)
+
     elif args.wkg:
         file_base = str(args.wkg)
         if file_base[-3:] != "csv":
