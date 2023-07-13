@@ -36,7 +36,7 @@ Notice: Make sure that your computer contains "numpy" and "pandas" or you should
 pip install numpy
 pip install pandas
 ```
-Or if you used "conda"
+Or if you use "conda"
 ```
 conda install numpy
 conda install pandas
@@ -44,8 +44,8 @@ conda install pandas
 
 
 ## Notice
-- It is under development.
-- In current status, only 預女獵白, 狼王守衛 would work.
+- It is under developed.
+- In current status, only 預女獵白, 狼王守衛 will work.
 - In current status, recording for 狼王守衛 is not completed.
 
 ## Rules for Scoring
@@ -56,7 +56,6 @@ conda install pandas
 - 女巫毒好人: -0.5 分
 - 獵人開槍帶走狼人: +0.5 分
 - 獵人開槍帶走好人: -0.5 分
-- 女巫毒好人: -0.5 分
 - 放逐公投時,好人投票投狼: +0.5 分
 - 放逐公投時,好人投票投好人: -0.5 分
 ### 狼王守衛
@@ -64,10 +63,9 @@ conda install pandas
 - 失敗方基礎分: -3 分
 - 女巫毒狼人: +0.5 分
 - 女巫毒好人: -0.5 分
-- 女巫毒好人: -0.5 分
 - 放逐公投時,好人投票投狼: +0.5 分
 - 放逐公投時,好人投票投好人: -0.5 分
-### More rules are still under developed and will be announced soon
+### More rules are still under developed and will be announced soon ~~~ (Have Fun ^-^)
 
 
 
