@@ -67,7 +67,7 @@ conda install pandas
 - 女巫毒好人: -0.5 分
 - 放逐公投時,好人投票投狼: +0.5 分
 - 放逐公投時,好人投票投好人: -0.5 分
-###More rules are still under developed and will be announced soon
+### More rules are still under developed and will be announced soon
 
 
 
