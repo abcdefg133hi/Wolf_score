@@ -1,3 +1,6 @@
+## Instruction
+狼人殺是一款桌遊!
+
 ## Shell Commands to activate the code:
 
 ```
