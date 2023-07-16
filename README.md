@@ -5,7 +5,7 @@
 
 ```
 git clone https://github.com/abcdefg133hi/Wolf_score.git
-cd wolf_score
+cd Wolf_score
 python3 ./wolf.py -h
 ```
 
@@ -22,7 +22,7 @@ python3 ./wolf.py -p4 [YourFile.csv]                 #For playing 血月獵魔.
 ### 預女獵白
 ```
 git clone https://github.com/abcdefg133hi/Wolf_score.git
-cd wolf_score
+cd Wolf_score
 python3 ./wolf.py -c record.csv:12
 python3 ./wolf.py -p1 record.csv
 open record.csv
@@ -30,16 +30,16 @@ open record.csv
 ### 狼王守衛
 ```
 git clone https://github.com/abcdefg133hi/Wolf_score.git
-cd wolf_score
+cd Wolf_score
 python3 ./wolf.py -c record.csv:12
 python3 ./wolf.py -p2 record.csv
 ```
-Notice: Make sure that your computer contains "numpy" and "pandas" or you should first package them by
+Notice: Make sure that your computer contains "numpy" and "pandas" or you should first install them by
 ```
 pip install numpy
 pip install pandas
 ```
-Or if you used "conda"
+Or if you use "conda"
 ```
 conda install numpy
 conda install pandas
@@ -47,8 +47,8 @@ conda install pandas
 
 
 ## Notice
-- It is under development.
-- In current status, only 預女獵白, 狼王守衛 would work.
+- It is under developed.
+- In current status, only 預女獵白, 狼王守衛 will work.
 - In current status, recording for 狼王守衛 is not completed.
 
 ## Rules for Scoring
@@ -59,7 +59,6 @@ conda install pandas
 - 女巫毒好人: -0.5 分
 - 獵人開槍帶走狼人: +0.5 分
 - 獵人開槍帶走好人: -0.5 分
-- 女巫毒好人: -0.5 分
 - 放逐公投時,好人投票投狼: +0.5 分
 - 放逐公投時,好人投票投好人: -0.5 分
 ### 狼王守衛
@@ -67,10 +66,9 @@ conda install pandas
 - 失敗方基礎分: -3 分
 - 女巫毒狼人: +0.5 分
 - 女巫毒好人: -0.5 分
-- 女巫毒好人: -0.5 分
 - 放逐公投時,好人投票投狼: +0.5 分
 - 放逐公投時,好人投票投好人: -0.5 分
-More rules are still under developed and will be announced soon
+### More rules are still under developed and will be announced soon ~~~ (Have Fun ^-^)
 
 
 
