@@ -444,9 +444,9 @@ def main():#
             if hunt!=0:
                 death = np.append(death, hunt)
                 if hunt in wolf_camp:
-                    df_play['特殊功能加分'] += 0.5
+                    df_play['特殊功能加分'][hunter-1] += 0.5
                 else:
-                    df_play['特殊功能加分'] += -0.5
+                    df_play['特殊功能加分'][hunter-1] += -0.5
                 print("%s玩家出局，請留遺言!"%hunt)
     elif witch_temp==int(wolf_temp):
         print("昨晚%s倒牌"%str(wolf_temp))
@@ -460,9 +460,9 @@ def main():#
             if hunt!=0:
                 death = np.append(death, hunt)
                 if hunt in wolf_camp:
-                    df_play['特殊功能加分'] += 0.5
+                    df_play['特殊功能加分'][hunter-1] += 0.5
                 else:
-                    df_play['特殊功能加分'] += -0.5
+                    df_play['特殊功能加分'][hunter-1] += -0.5
                 print("%s玩家出局，請留遺言!"%hunt)
 
     if sergeant in death:
@@ -483,7 +483,7 @@ def main():#
         for i in range(12):
             df_play[label][i] = vote_array[0,i]
             df_play[label_pk][i] = vote_array[1,i]
-        df_play['特殊功能加分'][hunter] += hunter_status
+        df_play['特殊功能加分'][hunter-1] += hunter_status
         game_status, winner = if_end(player_survive, wolf_camp, god_camp, villager_camp, sergeant)
         if(not game_status):
             break
