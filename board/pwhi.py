@@ -135,6 +135,10 @@ def night(player_survive, wolf_camp, god_camp, villager_camp, witch_action, witc
     death = death.astype('float')
     death = death.astype('int')
     player_survive = np.setdiff1d(player_survive, death)
+    if sergeant in death:
+        temp = input("%s移交警徽給(撕掉請輸入0):"%str(sergeant))
+        sergeant = int(temp)
+
     return player_survive, witch_action, witch_status, hunter_status, sergeant
 
 def daily(player_survive, wolf_camp, god_camp, villager_camp, hunter, sergeant):
@@ -496,6 +500,10 @@ def main():#
         if(not game_status):
             break
 
+    mvp1 = input("請輸入第一位好人陣營 MVP:")
+    mvp2 = input("請輸入第二位好人陣營 MVP:")
+    mvp3 = input("請輸入一位狼人陣營 MVP:")
+
     scores = np.zeros((12,4))
     if winner==0:   #好人獲勝
         for player in range(1,13):
@@ -524,6 +532,10 @@ def main():#
                 scores[player-1,2] = 0
                 scores[player-1,3] = 1
 
+    #MVP
+    scores[int(mvp1)-1, 1] += 5
+    scores[int(mvp2)-1, 1] += 3
+    scores[int(mvp3)-1, 1] += 5
     for player in range(1,13):
         for game_day in range(1,7):
             label = "第"+str(game_day)+"輪投票 (0 for 棄票, -1 for 無法投票)"

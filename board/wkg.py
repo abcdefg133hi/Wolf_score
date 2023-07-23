@@ -7,7 +7,7 @@ def order_initialize(array):
         array[i] = i+1
     return array
 
-def if_end(player_survive, wolf_camp, god_camp, villager_camp,sergeant):
+def if_end(player_survive, wolf_camp, god_camp, villager_camp, sergeant):
     winner = -1
     good_camp_survive = np.setdiff1d(player_survive, wolf_camp)
     god_camp_survive = np.setdiff1d(good_camp_survive, villager_camp)
@@ -38,7 +38,14 @@ def if_end(player_survive, wolf_camp, god_camp, villager_camp,sergeant):
     return True, winner
 
 
-def night(player_survive, wolf_camp, god_camp, villager_camp, witch_action, witch, prophet, hunter, wolf_king, sergeant):
+def night(player_survive, wolf_camp, god_camp, villager_camp, witch_action, guard, witch, prophet, hunter, wolf_king, sergeant):
+    guard_action = input("請輸入守衛守護對象 (0:空守):")
+    if int(guard_action)==0:
+        print("選擇空守")
+    else:
+        print("守%s"%int(guard_action))
+        
+    guard_action = int(guard_action)
     wolf_temp = input("請輸入狼人擊殺對象 (0:空刀):")
     witch_temp = input("請輸入女巫是否發動技能（-1:空, 0:救人, 座位號碼:毒人):")
     prophet_temp = input("請輸入預言家查驗對象:")
@@ -46,6 +53,7 @@ def night(player_survive, wolf_camp, god_camp, villager_camp, witch_action, witc
     death = np.array([])
     witch_status = 0
     hunter_status = 0
+    wolf_king_status = 0
     if prophet not in player_survive:
         pass
     else:
@@ -98,16 +106,33 @@ def night(player_survive, wolf_camp, god_camp, villager_camp, witch_action, witc
             if hunt!=0:
                 print("%s玩家出局，請留遺言!"%hunt)
                 death = np.append(death, hunt)
-                """
+                
                 if hunt in wolf_camp:
-                    df_play['特殊功能加分'] += 0.5
+                    hunter_status += 0.5
                 else:
-                    df_play['特殊功能加分'] += -0.5
-                """
-                if hunt == hunter or hunt == wolf_king:
+                    hunter_status += -0.5
+                
+                if hunt == wolf_king:
                     hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
                     death = np.append(death, hunt)
                     print("%s玩家出局，請留遺言!"%hunt)
+                    wolf_king_status += 0.5
+    
+        elif int(wolf_temp)==wolf_king:
+            hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+            if hunt!=0:
+                print("%s玩家出局，請留遺言!"%hunt)
+                death = np.append(death, hunt)
+                wolf_king_status += 0.5
+                
+                if hunt == hunter:
+                    hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+                    death = np.append(death, hunt)
+                    print("%s玩家出局，請留遺言!"%hunt)
+                    if hunt in wolf_camp:
+                        hunter_status += 0.5
+                    else:
+                        hunter_status += -0.5
     elif witch_temp == 0:
         print("昨晚為平安夜!")
     elif int(wolf_temp)==0 and witch_temp==-1:
@@ -119,24 +144,51 @@ def night(player_survive, wolf_camp, god_camp, villager_camp, witch_action, witc
         print("昨晚為平安夜")
     elif witch_temp>0 and int(wolf_temp)==guard_action:
         print("昨晚%s倒牌"%str(witch_temp))
+        death = np.append(death, int(witch_temp))
     elif witch_temp==-1:
         print("昨晚%s倒牌"%str(wolf_temp))
         death = np.append(death, int(wolf_temp))
-        if int(wolf_temp)==hunter or int(wolf_temp)==wolf_king:
+        if int(wolf_temp)==hunter:
             hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
             if hunt!=0:
                 print("%s玩家出局，請留遺言!"%hunt)
                 death = np.append(death, hunt)
-                """
+
                 if hunt in wolf_camp:
-                    df_play['特殊功能加分'] += 0.5
+                    hunter_status += 0.5
                 else:
-                    df_play['特殊功能加分'] += -0.5
-                """
-                if hunt == hunter or hunt == wolf_king:
+                    hunter_status += -0.5
+                
+                if hunt == wolf_king:
                     hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
                     death = np.append(death, hunt)
                     print("%s玩家出局，請留遺言!"%hunt)
+                    if hunt == witch:
+                        wolf_king_status += 1
+                    elif hunt == guard:
+                        wolf_king_status += 2
+                    else:
+                        wolf_king_status += 0.5
+        elif  int(wolf_temp)==wolf_king:
+            hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+            if hunt!=0:
+                print("%s玩家出局，請留遺言!"%hunt)
+                death = np.append(death, hunt)
+                if hunt == witch:
+                    wolf_king_status += 1
+                elif hunt == guard:
+                    wolf_king_status += 2
+                else:
+                    wolf_king_status += 0.5
+                
+                if hunt == hunter:
+                    hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+                    death = np.append(death, hunt)
+                    print("%s玩家出局，請留遺言!"%hunt)
+                    if hunt in wolf_camp:
+                        hunter_status += 0.5
+                    else:
+                        hunter_status += -0.5
     elif witch_temp==int(wolf_temp):
         print("昨晚%s倒牌"%str(wolf_temp))
         death = np.append(death, int(wolf_temp))
@@ -144,32 +196,63 @@ def night(player_survive, wolf_camp, god_camp, villager_camp, witch_action, witc
         print("昨晚倒牌的玩家有兩名", wolf_temp, str(witch_temp))
         death = np.append(death, int(wolf_temp))
         death = np.append(death, witch_temp)
-        if int(wolf_temp)==hunter or int(wolf_temp)==wolf_king:
+        if int(wolf_temp)==hunter:
             hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
             if hunt!=0:
                 print("%s玩家出局，請留遺言!"%hunt)
                 death = np.append(death, hunt)
-                """
+                
                 if hunt in wolf_camp:
-                    df_play['特殊功能加分'] += 0.5
+                    hunter_status += 0.5
                 else:
-                    df_play['特殊功能加分'] += -0.5
-                """
-                if hunt == hunter or hunt == wolf_king:
+                    hunter_status += -0.5
+                
+                if hunt == wolf_king:
                     hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
                     death = np.append(death, hunt)
                     print("%s玩家出局，請留遺言!"%hunt)
+                    if hunt == witch:
+                        wolf_king_status += 1
+                    elif hunt == guard:
+                        wolf_king_status += 2
+                    else:
+                        wolf_king_status += 0.5
+        elif int(wolf_temp)==wolf_king:
+            hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+            if hunt!=0:
+                print("%s玩家出局，請留遺言!"%hunt)
+                death = np.append(death, hunt)
+                if hunt == witch:
+                    wolf_king_status += 1
+                elif hunt == guard:
+                    wolf_king_status += 2
+                else:
+                    wolf_king_status += 0.5
+                
+                if hunt == hunter:
+                    hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+                    death = np.append(death, hunt)
+                    print("%s玩家出局，請留遺言!"%hunt)
+                    if hunt in wolf_camp:
+                        hunter_status += 0.5
+                    else:
+                        hunter_status += -0.5
 
     death = death.astype('float')
     death = death.astype('int')
     player_survive = np.setdiff1d(player_survive, death)
-    return player_survive, witch_action, witch_status, hunter_status, sergeant
+    if sergeant in death:
+        temp = input("%s移交警徽給(撕掉請輸入0):"%str(sergeant))
+        sergeant = int(temp)
 
-def daily(player_survive, wolf_camp, god_camp, villager_camp, hunter, wolf_king, sergeant):
+    return player_survive, witch_action, witch_status, hunter_status, wolf_king_status, sergeant
+
+def daily(player_survive, wolf_camp, god_camp, villager_camp, guard, witch, hunter, wolf_king, sergeant):
     death = np.array([])
     tickets = np.zeros(12)      #Initialize
     vote_array = np.zeros((2,12))-1.  #(vote, pk vote), 0:棄票, -1:不能投票
-    hunter_status = 0           #獵人是否帶到狼, 0:無開槍, -1:無, 1:有
+    hunter_status = 0   
+    wolf_king_status = 0        
     no_one_dead_today = False
 
     print("發言完畢時請按Enter以繼續")
@@ -236,16 +319,38 @@ def daily(player_survive, wolf_camp, god_camp, villager_camp, hunter, wolf_king,
                 if hunt!=0:
                     print("%s玩家出局，請留遺言!"%hunt)
                     death = np.append(death, hunt)
+                    if tickets.argmax()+1==hunter:
+                        if hunt in wolf_camp:
+                            hunter_status += 0.5
+                        else:
+                            hunter_status += -0.5
+                    elif tickets.argmax()+1==wolf_king:
+                        if hunt == witch:
+                            wolf_king_status += 1
+                        elif hunt == guard:
+                            wolf_king_status += 2
+                        else:
+                            wolf_king_status += 0.5
+
                     if hunt == hunter or hunt == wolf_king:
                         print("%s玩家出局，請留遺言!"%hunt)
                         death = np.append(death, hunt)
-
-                    """
-                    if hunt in wolf_camp:
-                        hunter_status = 0.5
-                    else:
-                        hunter_status = -0.5
-                    """
+                        hunt = int(input("公投出局的玩家是否要開槍:(0 for 不開槍)"))
+                        if hunt!=0:
+                            print("%s玩家出局，請留遺言!"%hunt)
+                            death = np.append(death, hunt)
+                        if hunt==hunter:
+                            if hunt in wolf_camp:
+                                hunter_status += 0.5
+                            else:
+                                hunter_status += -0.5
+                        elif hunt==wolf_king:
+                            if hunt == witch:
+                                wolf_king_status += 1
+                            elif hunt == guard:
+                                wolf_king_status += 2
+                            else:
+                                wolf_king_status += 0.5
 
         death = death.astype('float')
         death = death.astype('int')
@@ -255,7 +360,7 @@ def daily(player_survive, wolf_camp, god_camp, villager_camp, hunter, wolf_king,
         temp = input("%s移交警徽給(撕掉請輸入0):"%str(sergeant))
         sergeant = int(temp)
 
-    return player_survive, vote_array, hunter_status, sergeant
+    return player_survive, vote_array, hunter_status, wolf_king_status, sergeant
 
 def main():#狼槍守衛
     pd.set_option('mode.chained_assignment', None)
@@ -482,16 +587,33 @@ def main():#狼槍守衛
             if hunt!=0:
                 print("%s玩家出局，請留遺言!"%hunt)
                 death = np.append(death, hunt)
-                """
+                
                 if hunt in wolf_camp:
-                    df_play['特殊功能加分'] += 0.5
+                    df_play['特殊功能加分'][hunter-1] += 0.5
                 else:
-                    df_play['特殊功能加分'] += -0.5
-                """
-                if hunt == hunter or hunt == wolf_king:
+                    df_play['特殊功能加分'][hunter-1] += -0.5
+                
+                if hunt == wolf_king:
                     hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
                     death = np.append(death, hunt)
                     print("%s玩家出局，請留遺言!"%hunt)
+                    df_play['特殊功能加分'][wolf_king-1] += 0.5
+        elif int(wolf_temp)==wolf_king:
+            hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+            if hunt!=0:
+                print("%s玩家出局，請留遺言!"%hunt)
+                death = np.append(death, hunt)
+                df_play['特殊功能加分'][wolf_king-1] += 0.5 
+                
+                if hunt == hunter:
+                    hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+                    death = np.append(death, hunt)
+                    print("%s玩家出局，請留遺言!"%hunt)
+                    if hunt in wolf_camp:
+                        df_play['特殊功能加分'][hunter-1] += 0.5
+                    else:
+                        df_play['特殊功能加分'][hunter-1] += -0.5
+                    
     elif witch_temp == 0:
         print("昨晚為平安夜!")
     elif int(wolf_temp)==0 and witch_temp==-1:
@@ -503,24 +625,43 @@ def main():#狼槍守衛
         print("昨晚為平安夜")
     elif witch_temp>0 and int(wolf_temp)==guard_action:
         print("昨晚%s倒牌"%str(witch_temp))
+        death = np.append(death, int(witch_temp))
     elif witch_temp==-1:
         print("昨晚%s倒牌"%str(wolf_temp))
         death = np.append(death, int(wolf_temp))
-        if int(wolf_temp)==hunter or int(wolf_temp)==wolf_king:
+        if int(wolf_temp)==hunter:
             hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
             if hunt!=0:
                 print("%s玩家出局，請留遺言!"%hunt)
                 death = np.append(death, hunt)
-                """
+                
                 if hunt in wolf_camp:
-                    df_play['特殊功能加分'] += 0.5
+                    df_play['特殊功能加分'][hunter-1] += 0.5
                 else:
-                    df_play['特殊功能加分'] += -0.5
-                """
-                if hunt == hunter or hunt == wolf_king:
+                    df_play['特殊功能加分'][hunter-1] += -0.5
+                
+                if hunt == wolf_king:
                     hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
                     death = np.append(death, hunt)
                     print("%s玩家出局，請留遺言!"%hunt)
+                    df_play['特殊功能加分'][wolf_king-1] += 0.5
+        elif int(wolf_temp)==wolf_king:
+            hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+            if hunt!=0:
+                print("%s玩家出局，請留遺言!"%hunt)
+                death = np.append(death, hunt)
+                df_play['特殊功能加分'][wolf_king-1] += 0.5
+                
+                if hunt == hunter:
+                    hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+                    death = np.append(death, hunt)
+                    print("%s玩家出局，請留遺言!"%hunt)
+                    if hunt in wolf_camp:
+                        df_play['特殊功能加分'][hunter-1] += 0.5
+                    else:
+                        df_play['特殊功能加分'][hunter-1] += -0.5
+                
+                    
     elif witch_temp==int(wolf_temp):
         print("昨晚%s倒牌"%str(wolf_temp))
         death = np.append(death, int(wolf_temp))
@@ -528,21 +669,38 @@ def main():#狼槍守衛
         print("昨晚倒牌的玩家有兩名", wolf_temp, str(witch_temp))
         death = np.append(death, int(wolf_temp))
         death = np.append(death, witch_temp)
-        if int(wolf_temp)==hunter or int(wolf_temp)==wolf_king:
+        if int(wolf_temp)==hunter:
             hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
             if hunt!=0:
                 print("%s玩家出局，請留遺言!"%hunt)
                 death = np.append(death, hunt)
-                """
+                
                 if hunt in wolf_camp:
-                    df_play['特殊功能加分'] += 0.5
+                    df_play['特殊功能加分'][hunter-1] += 0.5
                 else:
-                    df_play['特殊功能加分'] += -0.5
-                """
-                if hunt == hunter or hunt == wolf_king:
+                    df_play['特殊功能加分'][hunter-1] += -0.5
+                
+                if hunt == wolf_king:
                     hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
                     death = np.append(death, hunt)
                     print("%s玩家出局，請留遺言!"%hunt)
+                    df_play['特殊功能加分'][wolf_king-1] += 0.5
+        elif int(wolf_temp)==wolf_king:
+            hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+            if hunt!=0:
+                print("%s玩家出局，請留遺言!"%hunt)
+                death = np.append(death, hunt)
+                df_play['特殊功能加分'][wolf_king-1] += 0.5
+
+                if hunt == hunter:
+                    hunt = int(input("出局的玩家是否要開槍:(0 for 不開槍)"))
+                    death = np.append(death, hunt)
+                    print("%s玩家出局，請留遺言!"%hunt)
+                    if hunt in wolf_camp:
+                        df_play['特殊功能加分'][hunter-1] += 0.5
+                    else:
+                        df_play['特殊功能加分'][hunter-1] += -0.5
+                    
 
 
     if sergeant in death:
@@ -556,27 +714,36 @@ def main():#狼槍守衛
         game_day += 1
         print("------第%s天白天------"%str(game_day))
         print("剩餘存活玩家為", player_survive)
-        player_survive, vote_array, hunter_status, sergeant = daily(player_survive, wolf_camp, god_camp, villager_camp, hunter, wolf_king, sergeant)
+        player_survive, vote_array, hunter_status, wolf_king_status, sergeant = daily(player_survive, wolf_camp, god_camp, villager_camp, guard, witch, hunter, wolf_king, sergeant)
 
         label = "第"+str(game_day)+"輪投票 (0 for 棄票, -1 for 無法投票)"
         label_pk = "第"+str(game_day)+"輪PK投票 (0 for 棄票, -1 for 無法投票)"
         for i in range(12):
             df_play[label][i] = vote_array[0,i]
             df_play[label_pk][i] = vote_array[1,i]
-        df_play['特殊功能加分'][hunter] += hunter_status
+        df_play['特殊功能加分'][hunter-1] += hunter_status
+        df_play['特殊功能加分'][wolf_king-1] += wolf_king_status
         game_status, winner = if_end(player_survive, wolf_camp, god_camp, villager_camp, sergeant)
         if(not game_status):
             break
         print("剩餘存活玩家為", player_survive)
         print("------第%s天晚上------"%str(game_day+1))
-        player_survive, witch_action, witch_status, hunter_status, sergeant = night(player_survive, wolf_camp, god_camp, villager_camp, witch_action,witch, prophet, hunter, wolf_king, sergeant)
+        player_survive, witch_action, witch_status, hunter_status, wolf_king_status, sergeant = night(player_survive, wolf_camp, god_camp, villager_camp, witch_action, guard, witch, prophet, hunter, wolf_king, sergeant)
         df_play['特殊功能加分'][hunter-1] += hunter_status
         df_play['特殊功能加分'][witch-1] += witch_status
+        df_play['特殊功能加分'][wolf_king-1] += wolf_king_status
         game_status, winner = if_end(player_survive, wolf_camp, god_camp, villager_camp, sergeant)
         if(not game_status):
             break
 
+    mvp1 = input("請輸入第一位好人陣營 MVP:")
+    mvp2 = input("請輸入第二位好人陣營 MVP:")
+    mvp3 = input("請輸入一位狼人陣營 MVP:")
+
+    #Scores Calculation
     scores = np.zeros((12,4))
+    
+    #Base Scores
     if winner==0:   #好人獲勝
         for player in range(1,13):
             if player in wolf_camp:
@@ -604,6 +771,10 @@ def main():#狼槍守衛
                 scores[player-1,2] = 0
                 scores[player-1,3] = 1
 
+    #MVP
+    scores[int(mvp1)-1, 1] += 5
+    scores[int(mvp2)-1, 1] += 3
+    scores[int(mvp3)-1, 1] += 5
     for player in range(1,13):
         for game_day in range(1,7):
             label = "第"+str(game_day)+"輪投票 (0 for 棄票, -1 for 無法投票)"
